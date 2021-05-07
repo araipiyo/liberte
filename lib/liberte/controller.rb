@@ -2,7 +2,7 @@ module Liberte
   # コントローラーの親クラス。これを継承してコントローラーを定義する。
   class Controller
     attr_reader :db
-    @@routing_table = {} # クラス自身のインスタンス変数であることに注意
+    @@routing_table = {}
     def initialize(req, params, opts)
       @opts = opts
       @db = opts[:db]
@@ -41,8 +41,9 @@ module Liberte
     # 以下は内部利用用
     # ルーティングする。定義されたパスからマッチするものを探して返す。
     def self.find_controller(path)
+      p path
       @@routing_table.each { |k,v|
-        k = Regexp.new(k.gsub(/%%/, "(.+?)")) if k.is_a?(String)
+        k = Regexp.new("\\A" + k.gsub(/%%/, "(.+?)") + "\\z") if k.is_a?(String)
         md = k.match(path)
         next unless md
         return [v[0], v[1], md.captures]
