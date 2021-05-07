@@ -27,15 +27,14 @@ module Liberte
       return ctrl_class.new(@req, params, @opts).instance_exec(*path_params, &action)
     end
     # アクションを定義する
-    # action "/foo/bar/%%/%%" { |a,b| hoge }
-    # action %r|/foo/bar/(a|b|c)| { |a| hoge }
-    # などと呼び出してアクションとパスを定義する。
-    def self.action(path, method = 'GET', &block)
-      @@routing_table[path] = [self, block, method]
-    end
+    # get "/foo/bar/%%/%%" { |a,b| hoge }
+    # post %r|/foo/bar/(a|b|c)| { |a| hoge }
+    # 子クラスで上記のように呼び出してアクションとパスを定義する。
     class <<self
       %w[get head post put delete options patch].each { |s|
-        define_method(s) { |path, &block| action(path, s.upcase, &block) }
+        define_method(s) { |path, &block|
+          @@routing_table[path] = [self, block, s.upcase]
+        }
       }
     end
     # before_filterを定義する。レスポンスを返せば動作が変わる
