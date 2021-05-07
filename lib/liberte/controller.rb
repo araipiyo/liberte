@@ -9,6 +9,10 @@ module Liberte
       @req = req
     end
     
+    # HTMLレスポンスを作る
+    def html(s)
+      [200, {'Content-Type' => 'text/html'}, [s]]
+    end
     # リダイレクトを行うレスポンスを作る。これを返すことでリダイレクト可能
     def permanent_redirect(url)
       [301, {location: url}, []]
@@ -26,8 +30,13 @@ module Liberte
     # action "/foo/bar/%%/%%" { |a,b| hoge }
     # action %r|/foo/bar/(a|b|c)| { |a| hoge }
     # などと呼び出してアクションとパスを定義する。
-    def self.action(path, &block)
-      @@routing_table[path] = [self, block]
+    def self.action(path, method = 'GET', &block)
+      @@routing_table[path] = [self, block, method]
+    end
+    class <<self
+      %w[get head post put delete options patch].each { |s|
+        define_method(s) { |path, &block| action(path, s.upcase, &block) }
+      }
     end
     # before_filterを定義する。レスポンスを返せば動作が変わる
     def before_filter
@@ -40,12 +49,12 @@ module Liberte
 
     # 以下は内部利用用
     # ルーティングする。定義されたパスからマッチするものを探して返す。
-    def self.find_controller(path)
-      p path
+    def self.find_controller(path, method = 'GET')
       @@routing_table.each { |k,v|
         k = Regexp.new("\\A" + k.gsub(/%%/, "(.+?)") + "\\z") if k.is_a?(String)
         md = k.match(path)
         next unless md
+        next unless v[2] == method
         return [v[0], v[1], md.captures]
       }
       return nil

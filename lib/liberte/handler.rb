@@ -25,7 +25,8 @@ module Liberte
         # リクエストパラメータをシンボルにする。利便性向上のため。
         params = req.params.deep_symbolize_keys
         # コントローラーを見つける
-        (ctrl_cls, action, path_params) = Controller.find_controller(req.path)
+        (ctrl_cls, action, path_params) = 
+          Controller.find_controller(req.path, req.request_method)
         # アクションを呼び出す (ctrlインスタンスのスコープ内で呼ぶ)
         result = unless ctrl_cls
           [404, {}, ["404 Not Found"]]
