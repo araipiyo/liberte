@@ -9,6 +9,10 @@ module Liberte
       @req = req
     end
     
+    # HTMLタグを作るヘルパー
+    def tags
+      Liberte::HTMLTags
+    end
     # HTMLレスポンスを作る
     def html(s)
       [200, {'Content-Type' => 'text/html'}, [s]]
