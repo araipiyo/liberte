@@ -4,9 +4,16 @@ require 'sequel'
 require 'liberte'
 require_relative 'controllers'
 
+$dburl = ""
+$db = nil
+
+def app
+  liberte = Liberte::Handler.new(db: $db)
+end
+
 def run_main
 #  Sequel.sqlite { |db|
-    require_relative 'model' # modelはSequelに接続したあとに読み込まないといけない
-    yield(nil)
+    require_relative 'model' # modelはSequelに接続したあとに読み込む必要
+    yield(app)
 #  }
 end

@@ -11,7 +11,7 @@ module Liberte
       @req = req
     end
     
-    # ERBを呼ぶ
+    # ERBを呼ぶ。テンプレート名を指定するだけ。XSS対策が弱いのでお勧めしない。
     def erb(template_name)
       erb = ERB.new(File.read("templates/#{template_name.to_s}.erb"))
       erb.filename = template_name.to_s

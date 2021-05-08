@@ -1,5 +1,6 @@
 
 require_relative 'liberte/version'
+require_relative 'liberte/utils/profile'
 
 module Liberte
   autoload :Handler, "liberte/handler"
