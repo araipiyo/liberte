@@ -1,3 +1,5 @@
+require 'active_support/all'
+
 module Liberte
   # コントローラーの親クラス。これを継承してコントローラーを定義する。
   class Controller
@@ -9,6 +11,12 @@ module Liberte
       @req = req
     end
     
+    # ERBを呼ぶ
+    def erb(template_name)
+      erb = ERB.new(File.read("templates/#{template_name.to_s}.erb"))
+      erb.filename = template_name.to_s
+      html(erb.result(binding).html_safe)
+    end
     # HTMLタグを作るヘルパー
     def tags
       Liberte::HTMLTags
@@ -55,10 +63,10 @@ module Liberte
     def self.find_controller(path, method = 'GET')
       @@routing_table.each { |k,v|
         k = Regexp.new("\\A" + k.gsub(/%%/, "(.+?)") + "\\z") if k.is_a?(String)
-        md = k.match(path)
-        next unless md
+        match_data = k.match(path)
+        next unless match_data
         next unless v[2] == method
-        return [v[0], v[1], md.captures]
+        return [v[0], v[1], match_data.captures]
       }
       return nil
     end
